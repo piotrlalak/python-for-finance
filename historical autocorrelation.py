@@ -174,7 +174,11 @@ def findHistoricalCorr(dataframe,comparison_df,period,step,visibleMargin,render,
     lowCorr_df = dataframe[lowestCorr[1]:lowestCorr[2]]   
     highCorr_df = dataframe[highestCorr[1]:highestCorr[2]]
     
-    resultsTitle = plotDateRange[1].strftime('%d/%m/%Y') + ' - ' + plotDateRange[2].strftime('%d/%m/%Y')
+    resultsTitle = 'Date: ' + plotDateRange[1].strftime('%d/%m/%Y')+ ' - ' + plotDateRange[2].strftime('%d/%m/%Y')
+    resultsTitle += ' | Length: ' + str(period)
+    resultsTitle += ' | Offset: ' + str(step)
+    resultsTitle += ' | Plot Margin: '+ str(visibleMargin)
+    
     filename = "output/hist_autocorr_" + timestamp + "_results.jpg"
     plotResults(dataframe[plotDateRange[0]:plotDateRange[3]],lowCorr_df,highCorr_df,lowestCorr[0],highestCorr[0],plotDateRange,resultsTitle,renderResults,True,filename)
 
