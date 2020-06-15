@@ -167,7 +167,7 @@ def findHistoricalCorr(dataframe,comparison_df,period,step,visibleMargin,lowCorr
                     print('> High pos/neg correlation: ' + str(round(tempCorrValue, 3)) + ', ' + str(startDate) + ':' + str(endDate))
                 hist_df = reindexHistDataframe(hist_df,[plotDateRange[0],plotDateRange[3]])
                 filename = "output/hist_autocorr_" + timestamp + '_' + str(int(a/step)) + ".jpg"
-                plotDataframes(dataframe,hist_df,plotDateRange,plotTitle,render,show,filename)
+                plotDataframes(dataframe[plotDateRange[0]:plotDateRange[3]],hist_df,plotDateRange,plotTitle,render,show,filename)
 
         else:
             pass
