@@ -118,7 +118,7 @@ def reindexHistDataframe(dataframe,daterange):
     reindexed_df.index = newIndex
     return reindexed_df
 
-def findHistoricalCorr(dataframe,comparison_df,period,step,visibleMargin,render,show,renderResults):
+def findHistoricalCorr(dataframe,comparison_df,period,step,visibleMargin,lowCorr,highCorr,render,show,renderResults,showResults,assetName):
 
     target_df = dataframe[-period:]
 
@@ -156,31 +156,36 @@ def findHistoricalCorr(dataframe,comparison_df,period,step,visibleMargin,render,
                 lowestCorr[1] = startDate
                 lowestCorr[2] = endDate
 
-            plotTitle = 'Correlation: ' + str(round(tempCorrValue, 3)) + ' | Target: '
+            plotTitle = assetName
+            plotTitle += ' | Correlation: ' + str(round(tempCorrValue, 3)) + ' | Target: '
             plotTitle += plotDateRange[1].strftime('%d/%m/%Y') + ' - ' + plotDateRange[2].strftime('%d/%m/%Y')
             plotTitle += ' | Historical: '+ sliced_hist_df.index[0].strftime('%d/%m/%Y') + ' - ' +  sliced_hist_df.index[len(sliced_hist_df)-1].strftime('%d/%m/%Y')
-            
-            hist_df = reindexHistDataframe(hist_df,[plotDateRange[0],plotDateRange[3]])
 
-            filename = "output/hist_autocorr_" + timestamp + '_' + str(int(a/step)) + ".jpg"
-            plotDataframes(dataframe,hist_df,plotDateRange,plotTitle,render,show,filename)
+            if tempCorrValue > highCorr or tempCorrValue < lowCorr:
+                print('\n> High pos/neg correlation: ' + str(round(tempCorrValue, 3)) + ', ' + str(startDate) + ':' + str(endDate) + '\n')
+                hist_df = reindexHistDataframe(hist_df,[plotDateRange[0],plotDateRange[3]])
+                filename = "output/hist_autocorr_" + timestamp + '_' + str(int(a/step)) + ".jpg"
+                plotDataframes(dataframe,hist_df,plotDateRange,plotTitle,render,show,filename)
 
         else:
             pass
 
+
+    print('\nLowest & highest correlations:')
     print(lowestCorr)
     print(highestCorr)
 
     lowCorr_df = dataframe[lowestCorr[1]:lowestCorr[2]]   
     highCorr_df = dataframe[highestCorr[1]:highestCorr[2]]
-    
-    resultsTitle = 'Date: ' + plotDateRange[1].strftime('%d/%m/%Y')+ ' - ' + plotDateRange[2].strftime('%d/%m/%Y')
+
+    resultsTitle = assetName
+    resultsTitle += ' | Date: ' + plotDateRange[1].strftime('%d/%m/%Y')+ ' - ' + plotDateRange[2].strftime('%d/%m/%Y')
     resultsTitle += ' | Length: ' + str(period)
     resultsTitle += ' | Offset: ' + str(step)
     resultsTitle += ' | Plot Margin: '+ str(visibleMargin)
-    
+
     filename = "output/hist_autocorr_" + timestamp + "_results.jpg"
-    plotResults(dataframe[plotDateRange[0]:plotDateRange[3]],lowCorr_df,highCorr_df,lowestCorr[0],highestCorr[0],plotDateRange,resultsTitle,renderResults,True,filename)
+    plotResults(dataframe[plotDateRange[0]:plotDateRange[3]],lowCorr_df,highCorr_df,lowestCorr[0],highestCorr[0],plotDateRange,resultsTitle,renderResults,showResults,filename)
 
 #----------------------------------------------- DATA
 
@@ -188,8 +193,15 @@ df = pd.read_csv('data/data.csv',index_col=0)
 df.index = pd.to_datetime(df.index)
 df = df['Close']
 
-#----------------------------------------------- PLOT
+#----------------------------------------------- PLOT INPUT DATA
 
-#main dataframe,comparison dataframe,period,step,visibleMargin,render,show,render results
-findHistoricalCorr(df,df,100,10,50,True,False,True)
+plt.plot(df)
+plt.yscale('log')
+plt.show()
 
+#----------------------------------------------- FIND CORRELATIONS
+
+assetName = 'asset_name'
+
+#main dataframe,comparison dataframe,period,step,visibleMargin,low correlation,high correlation,render,show,render results,show results, asset name (title)
+findHistoricalCorr(df,df,50,1,25,-0.9,0.9,True,False,True,False,assetName)
