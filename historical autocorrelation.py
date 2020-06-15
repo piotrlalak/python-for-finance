@@ -118,7 +118,7 @@ def reindexHistDataframe(dataframe,daterange):
     reindexed_df.index = newIndex
     return reindexed_df
 
-def findHistoricalCorr(dataframe,comparison_df,period,step,visibleMargin,lowCorr,highCorr,render,show,renderResults,showResults,assetName,verbose):
+def findHistoricalCorr(dataframe,comparison_df,period,step,visibleMargin,skip,lowCorr,highCorr,render,show,renderResults,showResults,assetName,verbose):
 
     target_df = dataframe[-period:]
 
@@ -130,10 +130,10 @@ def findHistoricalCorr(dataframe,comparison_df,period,step,visibleMargin,lowCorr
     highestCorr = [0,0,0]
     lowestCorr = [0,0,0]
 
-    timestamp = time.strftime("%d-%m-%Y-%H-%M")
+    timestamp = time.strftime("%d-%m-%Y-%H-%M-%S")
 
     loopLength = len(dataframe) - period + step  
-    for a in range(step,loopLength,step):
+    for a in range(skip,loopLength,step):
 
         startDate = int(len(dataframe) - period - a - (visibleMargin))
         endDate = int(len(dataframe) - a + (visibleMargin))
@@ -205,5 +205,5 @@ plt.show()
 
 assetName = 'asset_name'
 
-#main dataframe,comparison dataframe,period,step,visibleMargin,low correlation,high correlation,render,show,render results,show results, asset name (title),verbose
-findHistoricalCorr(df,df,50,1,25,-0.9,0.9,True,False,True,False,assetName,2)
+#main dataframe,comparison dataframe,period,step,visibleMargin,skip dates,low correlation,high correlation,render,show,render results,show results, asset name (title),verbose
+findHistoricalCorr(df,df,100,1,25,0,-0.9,0.9,True,False,True,True,assetName,1)
