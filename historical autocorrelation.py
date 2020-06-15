@@ -118,7 +118,7 @@ def reindexHistDataframe(dataframe,daterange):
     reindexed_df.index = newIndex
     return reindexed_df
 
-def findHistoricalCorr(dataframe,comparison_df,period,step,visibleMargin,lowCorr,highCorr,render,show,renderResults,showResults,assetName):
+def findHistoricalCorr(dataframe,comparison_df,period,step,visibleMargin,lowCorr,highCorr,render,show,renderResults,showResults,assetName,verbose):
 
     target_df = dataframe[-period:]
 
@@ -144,7 +144,8 @@ def findHistoricalCorr(dataframe,comparison_df,period,step,visibleMargin,lowCorr
             hist_df = valueScaler(hist_df,target_df.min(),target_df.max())
             sliced_hist_df = hist_df[visibleMargin:-visibleMargin]
             tempCorrValue= correlationValue(target_df,sliced_hist_df)
-            print(startDate,endDate,str(round(tempCorrValue, 3)))
+            if verbose > 1:
+                print(startDate,endDate,str(round(tempCorrValue, 3)))
 
             if tempCorrValue > highestCorr[0]:
                 highestCorr[0] = tempCorrValue
@@ -162,7 +163,8 @@ def findHistoricalCorr(dataframe,comparison_df,period,step,visibleMargin,lowCorr
             plotTitle += ' | Historical: '+ sliced_hist_df.index[0].strftime('%d/%m/%Y') + ' - ' +  sliced_hist_df.index[len(sliced_hist_df)-1].strftime('%d/%m/%Y')
 
             if tempCorrValue > highCorr or tempCorrValue < lowCorr:
-                print('\n> High pos/neg correlation: ' + str(round(tempCorrValue, 3)) + ', ' + str(startDate) + ':' + str(endDate) + '\n')
+                if verbose > 0:
+                    print('> High pos/neg correlation: ' + str(round(tempCorrValue, 3)) + ', ' + str(startDate) + ':' + str(endDate))
                 hist_df = reindexHistDataframe(hist_df,[plotDateRange[0],plotDateRange[3]])
                 filename = "output/hist_autocorr_" + timestamp + '_' + str(int(a/step)) + ".jpg"
                 plotDataframes(dataframe,hist_df,plotDateRange,plotTitle,render,show,filename)
@@ -203,5 +205,5 @@ plt.show()
 
 assetName = 'asset_name'
 
-#main dataframe,comparison dataframe,period,step,visibleMargin,low correlation,high correlation,render,show,render results,show results, asset name (title)
-findHistoricalCorr(df,df,50,1,25,-0.9,0.9,True,False,True,False,assetName)
+#main dataframe,comparison dataframe,period,step,visibleMargin,low correlation,high correlation,render,show,render results,show results, asset name (title),verbose
+findHistoricalCorr(df,df,50,1,25,-0.9,0.9,True,False,True,False,assetName,2)
